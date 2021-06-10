@@ -1,5 +1,10 @@
 ## stream struct
 
+<img src="https://i.ibb.co/tKdfYNv/libutilstsicon128.png" alt="lib-utils-ts" border="0" />
+
+## Dependencies
+
+- lib-utils-ts `>= 2.0.0-stable`
 
 ## Types
 
