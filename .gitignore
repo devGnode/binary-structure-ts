@@ -1,6 +1,7 @@
 node_modules/
 .idea/
 lib/
+Test/
 
 # testsFiles
 src/*-Test.ts
