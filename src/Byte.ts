@@ -4,7 +4,7 @@ import {int8,BYTE} from "./Globals";
 /****
 * @Byte
 */
-export class Byte extends  PrimitiveNumber.Signed8 implements BYTE{
+export class Byte extends PrimitiveNumber.Unsigned8 implements BYTE{
 
     constructor(value:Number=null) {
         super(value);
@@ -17,7 +17,7 @@ export class Byte extends  PrimitiveNumber.Signed8 implements BYTE{
     /****
      *
      */
-    public getType(): string {return Int8.class().getName();}
+    public getType(): string {return Byte.class().getName();}
     /****
      *
      */
@@ -25,15 +25,15 @@ export class Byte extends  PrimitiveNumber.Signed8 implements BYTE{
     /****
      *
      */
-    public toInt8():Int8 {return Int8.mk(this.valueOf()&0xff); }
+    public toInt8():Int8 {return Int8.mk((( this.valueOf() << 24 ) >> 24)); }
     /****
      *
      */
-    public static mk(value:number=null):Uint8{return new Uint8(value);}
+    public static mk(value:number=null):Byte{return new Byte(value);}
     /****
      *
      */
-    public static random(min: Uint8 = null, max: Uint8 = null): Byte {
+    public static random(min:  Byte = null, max:  Byte = null): Byte {
         return Byte.mk(Byte.mk(0).random(min, max).valueOf());
     }
 }
@@ -62,7 +62,7 @@ export class Uint8 extends PrimitiveNumber.Unsigned8 implements BYTE{
     /****
      *
      */
-    public toInt8():Int8 {return Int8.mk(this.valueOf()&0xff); }
+    public toInt8():Int8 {return Int8.mk((( this.valueOf() << 24 ) >> 24)); }
     /****
      *
      */
@@ -87,7 +87,7 @@ export class Int8 extends PrimitiveNumber.Signed8 implements int8{
     /****
      *
      */
-    public endian():Int8{return Int8.mk(super.endian().valueOf())}
+    public endian():Int8{return new Int8(super.endian().valueOf())}
     /****
      *
      */
@@ -99,7 +99,7 @@ export class Int8 extends PrimitiveNumber.Signed8 implements int8{
     /****
      *
      */
-    public toUint8(): Byte {return Byte.mk(this.valueOf()&0xff);}
+    public toUint8(): Uint8 {return new Uint8(this.valueOf()&0xff);}
     /****
      *
      */

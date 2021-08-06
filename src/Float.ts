@@ -12,7 +12,7 @@ export class Float extends PrimitiveNumber.Float32 implements float{
         this.orThrow();
     }
 
-    public endian():Float{return Float.mk(super.endian().valueOf())}
+    public endian():Float {return this.toUint32().endian().toFloat();}
 
     public getType(): string {return Float.class().getName();}
 

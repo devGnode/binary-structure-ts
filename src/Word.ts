@@ -15,7 +15,7 @@ export class Word extends PrimitiveNumber.Unsigned16 implements WORD{
     /****
      *
      */
-    public endian():Word{return Word.mk(super.endian().valueOf())}
+    public endian():Word{return new Word(super.endian().valueOf())}
     /****
      *
      */
@@ -53,19 +53,19 @@ export class Uint16 extends PrimitiveNumber.Unsigned16 implements WORD{
     /****
      *
      */
-    public endian():Uint16{return Uint16.mk(super.endian().valueOf())}
+    public endian():Uint16{return new Uint16(super.endian().valueOf())}
     /****
      *
      */
-    public getType(): string {return Word.class().getName();}
+    public getType(): string {return Uint16.class().getName();}
     /****
      *
      */
-    public operators( ):Operator<Word>{return new Operator<Word>(this);}
+    public operators( ):Operator<Uint16>{return new Operator<Uint16>(this);}
     /****
      *
      */
-    public toInt16():Int16 {return Int16.mk(this.valueOf()&0xffff ); }
+    public toInt16():Int16 {return new Int16(( this.valueOf() << 16 ) >> 16 ); }
     /****
      *
      */
@@ -92,7 +92,7 @@ export class Int16 extends PrimitiveNumber.Signed16 implements int16{
     /****
      *
      */
-    public endian():Int16{return Int16.mk(super.endian().valueOf())}
+    public endian():Int16{return new Int16(super.endian().valueOf());}
     /****
      *
      */
@@ -104,7 +104,7 @@ export class Int16 extends PrimitiveNumber.Signed16 implements int16{
     /****
      *
      */
-    public toUint16():Uint16 {return Uint16.mk(this.valueOf()&0xff); }
+    public toUint16():Uint16 {return new Uint16(this.valueOf()&0xffff); }
     /****
      *
      */

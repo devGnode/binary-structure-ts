@@ -47,9 +47,9 @@ export abstract class Convert{
         return consumer;
     }
     /***
-     * @reversed
+     * @reversedToNumber
      */
-    protected static reversed( value:string, radix:number, action:ConsumerResult<string,number>):number{
+    protected static reversed<T>( value:T[], radix:number, action:ConsumerResult<T,number>):number{
         let out:number = 0, len:number = value.length,
             i:number  = len-1, accepted:number;
 
@@ -216,29 +216,31 @@ export abstract class Convert{
      */
     public static To = new class To implements convert{
         /***
-         * @Convert.To: binary
+         * @Convert.To: binary, value should be less than 0x00FFFFFFFFFFFF
+         * and equals pr greater than 0.
+         *
          * @IOException
          * if is a negative number cast it in unsigned number
          */
-        public bin(value:number):string{return Convert.convert(value, Convert.BIN, new Convert.ConvertConsumer() ).get();}
+        public bin(value:number):string{return Convert.convert(Object.requireNotNull(value), Convert.BIN, new Convert.ConvertConsumer() ).get();}
         /***
          * @Convert.To: octal
          * @IOException
          * if is a negative number cast it in unsigned number
          */
-        public octal(value:number):string{return Convert.convert(value, Convert.OCT, new Convert.ConvertConsumer() ).get();}
+        public octal(value:number):string{return Convert.convert(Object.requireNotNull(value), Convert.OCT, new Convert.ConvertConsumer() ).get();}
         /***
          * @Convert.To: hex
          * @IOException
          * if is a negative number cast it in unsigned number
          */
-        public hex(value:number):string{return Convert.convert(value, Convert.HEX, new Convert.ConvertHexConsumer() ).get();}
+        public hex(value:number):string{return Convert.convert(Object.requireNotNull(value), Convert.HEX, new Convert.ConvertHexConsumer() ).get();}
         /***
          * @binBinary
          * @IOException
          */
         public binBinary(value:number, sizeof:number, opts:number= Convert.RD ):string{
-            return Convert.convert(value, Convert.BIN, new Convert.ConvertBinConsumer( opts, Object.requireNotNull(sizeof) ) ).get();
+            return Convert.convert(Object.requireNotNull(value), Convert.BIN, new Convert.ConvertBinConsumer( opts, Object.requireNotNull(sizeof) ) ).get();
         }
         /***
          * @Convert.To: hexBinary
@@ -252,7 +254,7 @@ export abstract class Convert{
                 let i:number=0, slice:number[], tmp: ConsumerResult<number,string>;
 
                 tmp = new Convert.ConvertHexBinaryConsumer(opts,Object.requireNotNull(sizeof));
-                slice = PrimitiveNumber.slice32(value,0x04).reverse();
+                slice = PrimitiveNumber.slice32(value).reverse();
                 do{tmp.accept(slice[i]);}while (slice[i++]&&i<sizeof);
 
                 return tmp.get();
@@ -281,7 +283,7 @@ export abstract class Convert{
          * @binToNumber
          */
         public binToNumber(value:string):number{
-            return Convert.reversed(Object.requireNotNull(value), Convert.BIN, new class extends Convert.UnConvertConsumer implements ConsumerResult<string, number>{
+            return Convert.reversed(Object.requireNotNull(value).split(''), Convert.BIN, new class extends Convert.UnConvertConsumer implements ConsumerResult<string, number>{
                 /***
                  * @override
                  */
@@ -296,7 +298,7 @@ export abstract class Convert{
          * @binToNumber
          */
         public hexToNumber(value:string):number{
-            return Convert.reversed(Object.requireNotNull(value), Convert.HEX, new class extends Convert.UnConvertConsumer implements ConsumerResult<string, number>{
+            return Convert.reversed(Object.requireNotNull(value).split(''), Convert.HEX, new class extends Convert.UnConvertConsumer implements ConsumerResult<string, number>{
                 /***
                  * @override
                  */
@@ -315,14 +317,17 @@ export abstract class Convert{
         /***
          * @binToNumber
          */
-        public octolStringToNumber(value:string):number{
-            return Convert.reversed(Object.requireNotNull(value), Convert.HEX, new  Convert.UnConvertConsumer());
+        public octalStringToNumber(value:string):number{
+            return Convert.reversed(Object.requireNotNull(value).split(''), Convert.HEX, new  Convert.UnConvertConsumer());
         }
         /***
          * @binToNumber
+         * @param value: String
+         * This method return a unsigned number
+         * 0 >= x <= 0x07FFFFFFFFFFFFFF
          */
         public strToNumber(value:string):number{
-            return Convert.reversed(Object.requireNotNull(value), LIMIT.DB + 1, new class extends Convert.UnConvertConsumer implements ConsumerResult<string, number>{
+            return Convert.reversed(Object.requireNotNull(value).split(''), LIMIT.DB + 1, new class extends Convert.UnConvertConsumer implements ConsumerResult<string, number>{
                 /***
                  * @override
                  */
@@ -334,5 +339,26 @@ export abstract class Convert{
 
             });
         }
+
+    }
+    /**
+     * @arrayToNumber
+     * @param value: Byte array
+     * This method return a unsigned number
+     * 0 >= x <= 0x07FFFFFFFFFFFFFF
+     */
+    public static arrayToNumber(value:number[]):number{
+        return Convert.reversed(Object.requireNotNull(value), LIMIT.DB + 1, new class implements ConsumerResult<number, number>{
+            /***
+             * @override
+             */
+            accept(o: number): number {
+                if( o  < 0 && o > 0xFF ) throw  new IOException(`Bad encoding use a binary buffer ISO/CEI 8859-1`);
+                return o;
+            }
+            clear(): void {}
+            get(): number {return undefined;}
+
+        });
     }
 }

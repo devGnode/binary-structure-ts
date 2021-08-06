@@ -1,8 +1,9 @@
 import {Operator} from "./Operator";
 import {PrimitiveNumber} from "./PrimitiveNumber";
-import {DWORD, float, int32} from "./Globals";
+import {DWORD, int32} from "./Globals";
 import {Float} from "./Float";
 import {Word} from "./Word";
+import {Convert} from "./Convert";
 /***
  * @Dword
  *
@@ -14,15 +15,15 @@ export class Dword extends PrimitiveNumber.Unsigned32 implements DWORD{
         this.orThrow();
     }
 
-    public endian():Dword{return Dword.mk(super.endian().valueOf())}
+    public endian():Dword{return new Dword(super.endian().valueOf())}
 
     public getType(): string {return Dword.class().getName();}
 
     public operators( ):Operator<Dword>{return new Operator<Dword>(this);}
 
-    public toInt32():Int32 {return Int32.mk(( this.valueOf() << 16 ) >> 16 ); }
+    public toInt32():Int32 {return Int32.mk(this.valueOf()&0xFFFFFFFF ); }
 
-    public toFloat(): float {
+    public toFloat(): Float {
         let valueOf:number = this.valueOf(),
             signed:number  = ( valueOf >> 31 )&0x01,
             exp:number     = ( valueOf&0x7f800000 ) >> 23,
@@ -50,20 +51,20 @@ export class Uint32 extends PrimitiveNumber.Unsigned32 implements DWORD{
         this.orThrow();
     }
 
-    public endian():Uint32{return Uint32.mk(super.endian().valueOf())}
+    public endian():Uint32{return new Uint32(super.endian().valueOf())}
 
     public getType(): string {return Uint32.class().getName();}
 
     public operators( ):Operator<Uint32>{return new Operator<Uint32>(this);}
 
-    public toInt32():Int32 {return Int32.mk(( this.valueOf() << 16 ) >> 16 ); }
+    public toInt32():Int32 {return Int32.mk(this.valueOf()&0xFFFFFFFF ); }
 
-    public toFloat(): float { return Dword.mk(this.valueOf()).toFloat(); }
+    public toFloat(): Float { return Dword.mk(this.valueOf()).toFloat(); }
 
-    public static mk(value:number=null):Dword{return new Dword(value);}
+    public static mk(value:number=null):Uint32 {return new Uint32(value);}
 
     public static random(min: Uint32 = null, max: Uint32 = null): Uint32 {
-        return Uint32.mk(Word.mk(0).random(min, max).valueOf());
+        return Uint32.mk(Dword.mk(0).random(min, max).valueOf());
     }
 }
 /***
@@ -77,13 +78,15 @@ export class Int32 extends PrimitiveNumber.Signed32 implements int32{
         this.orThrow();
     }
 
-    public endian():Int32{return Int32.mk(super.endian().valueOf())}
+    public endian():Int32{return new Int32(super.endian().valueOf())}
 
     public getType(): string {return Int32.class().getName();}
 
     public operators( ):Operator<Int32>{return new Operator<Int32>(this);}
 
-    public toUint32():Uint32 {return Uint32.mk(( this.valueOf() << 16 ) >> 16 ); }
+    public toUint32():Uint32 {
+        return Uint32.mk(Convert.arrayToNumber( PrimitiveNumber.slice32(this.valueOf()) ));
+    }
 
     public static mk(value:number=null):Int32{return new Int32(value);}
 
