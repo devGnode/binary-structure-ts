@@ -14,8 +14,6 @@ export class Float extends PrimitiveNumber.Float32 implements float{
 
     public endian():Float {return this.toUint32().endian().toFloat();}
 
-    public getType(): string {return Float.class().getName();}
-
     public operators( ):Operator<Float>{return new Operator<Float>(this);}
 
     public toUint32():Uint32 {

@@ -19,10 +19,6 @@ export class Word extends PrimitiveNumber.Unsigned16 implements WORD{
     /****
      *
      */
-    public getType(): string {return Word.class().getName();}
-    /****
-     *
-     */
     public operators( ):Operator<Word>{return new Operator<Word>(this);}
     /****
      *
@@ -54,10 +50,6 @@ export class Uint16 extends PrimitiveNumber.Unsigned16 implements WORD{
      *
      */
     public endian():Uint16{return new Uint16(super.endian().valueOf())}
-    /****
-     *
-     */
-    public getType(): string {return Uint16.class().getName();}
     /****
      *
      */
@@ -93,10 +85,6 @@ export class Int16 extends PrimitiveNumber.Signed16 implements int16{
      *
      */
     public endian():Int16{return new Int16(super.endian().valueOf());}
-    /****
-     *
-     */
-    public getType(): string {return Int16.class().getName();}
     /****
      *
      */

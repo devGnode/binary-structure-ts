@@ -12,8 +12,6 @@ export class Double extends PrimitiveNumber.Unsigned64 implements double{
 
     public endian(): Double {return Double.mk(super.endian().valueOf())}
 
-    public getType(): string {return Double.class().getName();}
-
     public operators(): Operator<Double> {return new Operator<Double>(this);}
 
     public toQword( ):QWORD{

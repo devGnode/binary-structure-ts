@@ -17,10 +17,6 @@ export class Byte extends PrimitiveNumber.Unsigned8 implements BYTE{
     /****
      *
      */
-    public getType(): string {return Byte.class().getName();}
-    /****
-     *
-     */
     public operators( ):Operator<Uint8>{return new Operator<Uint8>(this);}
     /****
      *
@@ -54,10 +50,6 @@ export class Uint8 extends PrimitiveNumber.Unsigned8 implements BYTE{
     /****
      *
      */
-    public getType(): string {return Int8.class().getName();}
-    /****
-     *
-     */
     public operators( ):Operator<Uint8>{return new Operator<Uint8>(this);}
     /****
      *
@@ -88,10 +80,6 @@ export class Int8 extends PrimitiveNumber.Signed8 implements int8{
      *
      */
     public endian():Int8{return new Int8(super.endian().valueOf())}
-    /****
-     *
-     */
-    public getType(): string {return Int8.class().getName();}
     /****
      *
      */

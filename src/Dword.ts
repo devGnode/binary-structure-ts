@@ -17,8 +17,6 @@ export class Dword extends PrimitiveNumber.Unsigned32 implements DWORD{
 
     public endian():Dword{return new Dword(super.endian().valueOf())}
 
-    public getType(): string {return Dword.class().getName();}
-
     public operators( ):Operator<Dword>{return new Operator<Dword>(this);}
 
     public toInt32():Int32 {return Int32.mk(this.valueOf()&0xFFFFFFFF ); }
@@ -53,8 +51,6 @@ export class Uint32 extends PrimitiveNumber.Unsigned32 implements DWORD{
 
     public endian():Uint32{return new Uint32(super.endian().valueOf())}
 
-    public getType(): string {return Uint32.class().getName();}
-
     public operators( ):Operator<Uint32>{return new Operator<Uint32>(this);}
 
     public toInt32():Int32 {return Int32.mk(this.valueOf()&0xFFFFFFFF ); }
@@ -79,8 +75,6 @@ export class Int32 extends PrimitiveNumber.Signed32 implements int32{
     }
 
     public endian():Int32{return new Int32(super.endian().valueOf())}
-
-    public getType(): string {return Int32.class().getName();}
 
     public operators( ):Operator<Int32>{return new Operator<Int32>(this);}
 
