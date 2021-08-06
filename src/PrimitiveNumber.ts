@@ -12,12 +12,12 @@ export abstract class PrimitiveNumber{
      * @evaluate
      */
     private static evaluate(maxValue: number, min: boolean, signed: boolean): number {
-        return signed ? min ? -Math.floor(maxValue / 2) : Math.floor(maxValue / 2) : min ? 0 : maxValue;
+        return signed ? min ? -Math.floor(maxValue / 2)-1 : Math.floor(maxValue / 2) : min ? 0 : maxValue;
     }
     /***
      * @slice32
      */
-    public static slice32(value:number, sizeof: number ):number[]{
+    public static slice32(value:number):number[]{
         return [( value >> 24 )&0xff, ( value >> 16 )&0xff, ( value >> 8 )&0xff, value&0xff]
     }
 
@@ -50,6 +50,11 @@ export abstract class PrimitiveNumber{
          * @override
          */
         public equals(o:Object):boolean{return this.valueOf().equals((<primitiveNumber>o).valueOf());}
+
+        /***
+         *
+         */
+        public getType():string{ return this.getClass().getName(); }
         /***
          * @newer
          */
@@ -58,6 +63,7 @@ export abstract class PrimitiveNumber{
          * @orThrow
          */
         public orThrow(message: string = null): primitiveNumber {
+            if(!this.signed()&&!this.isPositive()) throw new IOException(`${this.getClass().getName()} is not a ${!this.signed() ? "s" : "uns"}igned number : [ ${this.valueOf()} ]`);
             if (this.isOverflow()) throw new NumericOverflow(message || `${this.signed() ? "S" : "Uns"}igned ${this.getClass().getName()} overflow  ${this.sizeOf()} byte(s) out of memory : [ ${this.valueOf()} ]`);
             if(!this.hasFloat()&&PrimitiveNumber.isFloat(this.valueOf())) throw new IOException(`${this.getClass().getName()} is not a float number !`);
             return this;
@@ -79,7 +85,7 @@ export abstract class PrimitiveNumber{
         /***
          * @isPositiveType
          */
-        public isPositive(): boolean {return this.valueOf() > 0;}
+        public isPositive(): boolean {return this.valueOf() >= 0;}
         /***
          * @sizeOf
          */
@@ -170,11 +176,11 @@ export abstract class PrimitiveNumber{
      */
     public static VOID = class VOID extends PrimitiveNumber.PrimitiveNumberBuilder{
 
-        constructor(value:Number = Types.VOID) {super(void 0, Types.VOID, Types.VOID);}
+        constructor(value:void = void 0) {super(void 0, Types.VOID, Types.VOID);}
 
         public endian(): VOID {return new VOID( void 0 );}
 
-        public newer( value:Number ):VOID{return new PrimitiveNumber.VOID(value); }
+        public newer( value:Number ):VOID{return new PrimitiveNumber.VOID(void 0); }
 
         public valueOf(): number {return void 0;}
     }
@@ -248,9 +254,12 @@ export abstract class PrimitiveNumber{
 
         constructor(value:Number = LIMIT.DW ) {super(Define.of(value).orNull(LIMIT.DW), LIMIT.DW,Types.uint32);}
 
+        /****
+         *  @endian :
+         *  with bitwise method for 4294967295 equals -1
+         */
         public endian(): Unsigned32 {
-            let v:number = this.valueOf();
-            return new Unsigned32( ( v&0xFF ) << 24 | ( ( v >> 8 )&0xFF ) << 16 | ( ( v >> 16 )&0xFF ) << 8 | (v>>24)&0xFF );
+            return new Unsigned32( Convert.arrayToNumber(PrimitiveNumber.slice32(this.valueOf()).reverse()) );
         }
 
         public newer( value:Number ):Unsigned32{return new PrimitiveNumber.Unsigned32(value); }
@@ -280,11 +289,6 @@ export abstract class PrimitiveNumber{
 
         constructor(value:Number = -1 ) {super(Define.of(value).orNull(-1), LIMIT.DW, Types.float);}
 
-        public endian(): Float32 {
-            let v:number = this.valueOf();
-            return new Float32( ( v&0xFF ) << 24 | ( ( v >> 8 )&0xFF ) << 16 | ( ( v >> 16 )&0xFF ) << 8 | (v>>24)&0xFF );
-        }
-
         public newer( value:Number ):Float32{return new PrimitiveNumber.Float32(value); }
     }
     /***
@@ -299,6 +303,10 @@ export abstract class PrimitiveNumber{
         public endian(): Unsigned64 { return null;}
 
         public newer( value:Number ):Unsigned64{return new PrimitiveNumber.Unsigned64(value); }
+
+        public valueOf(): number {
+            return 0;
+        }
     }
     /***
      *
@@ -308,6 +316,8 @@ export abstract class PrimitiveNumber{
     public static Signed64 = class Signed64 extends PrimitiveNumber.PrimitiveNumberBuilder{
 
         constructor(value:Number = -1 ) {super(Define.of(value).orNull(-1), LIMIT.QW, Types.int64);}
+
+        public newer( value:Number ):Signed64{return new PrimitiveNumber.Signed64(value); }
 
         public endian(): Signed64 {return null}
     }
