@@ -1,11 +1,5 @@
 import "lib-utils-ts/src/globalUtils"
-import {AbstractBitNumber} from "./AbstractBitNumber";
-import {Byte, int8, uint8} from "./Byte";
-import {int16, u_short, uint16, WORD} from "./Word";
-import {DWORD, int32, uint32} from "./Dword";
-import {int64, QWORD, u_long} from "./QWORD";
-import {Float} from "./Float";
-import {Double} from "./Double";
+import {Byte} from "./Byte";
 import {Char, CString, Pointer} from "./Pointer";
 import {AbstractBiString} from "./AbstractBiString";
 import {
@@ -15,12 +9,14 @@ import {
     int16Array,
     DwordArray,
     int32Array,
-    QwordArray,
-    int64Array,
+    //QwordArray,
+    //int64Array,
     FloatArray,
-    DoubleArray,
+    //DoubleArray,
     ArrayL
 } from "./ArrayL";
+import {IConsumer} from "lib-utils-ts/src/Interface";
+import {Operator} from "./Operator";
 /***
  * Enum : Bits size
  */
@@ -41,40 +37,319 @@ export enum LIMIT {
 }
 //Enum all types supported
 export enum Types{
-
+    /***
+     * 1 Bytes
+     */
     VOID    = 0x00,
     BYTE    = 0x01,
     uint8   = Types.BYTE,
     char    = Types.BYTE,
     boolean = Types.BYTE,
-
+    /***
+     * 2 Bytes
+     */
     WORD    = 0x02,
     uint16  = Types.WORD,
     u_short = Types.WORD,
-
+    /***
+     * 4 Bytes
+     */
     DWORD   = 0x04,
     uint32  = Types.DWORD,
-
+    /***
+     * 8 Bytes
+     */
     QWORD   = 0x08,
     u_long  = Types.QWORD,
-
+    /***
+     * 1 Bytes
+     */
     int8    = 0x11,
     int16   = 0x12,
     int32   = 0x14,
     int64   = 0x18,
-
-    float   = 0x24,
-    double  = 0x28
+    /***
+     * 4 Bytes
+     */
+    float   = 0x34,
+    /***
+     * 2 Bytes
+     */
+    double  = 0x38
 }
-/****
+
+export type consumerFnResult<T,R> = ( o: T ) => R | void
+export interface ConsumerResult<T,R> extends IConsumer<T>{
+    accept:consumerFnResult<T,R>
+    /***
+     *
+     */
+    get( ):R
+    /***
+     *
+     */
+    clear():void
+}
+export interface spliteratorResult<T,R>{
+    /***
+     *
+     */
+    tryAdvance( action: ConsumerResult<T,R> ):boolean
+    forEachRemaining(action:  ConsumerResult<T,R>):void
+}
+
+export interface ConvertReserved<T,R> extends spliteratorResult<T,R>{
+
+}
+/***
  *
  */
-export interface bitNumber extends Number{
-    toHex():string
+export interface convert {
+    /***
+     *
+     */
+    hex(a:number)
+    /***
+     *
+     */
+    octal(value:number):string
+    /***
+     *
+     */
+    bin(value:number):string
+    /***
+     *
+     */
+    base(value:number, radix:number, consumer:ConsumerResult<number,string>):string
+}
+/***
+ * @primitiveNumber
+ */
+export interface primitiveNumber extends Number{
+    /***
+     *
+     */
+    isOverflow( ):boolean
+    /***
+     *
+     */
     signed():boolean
-    sizeOf():number
+    /***
+     *
+     */
+    isPositive( ):boolean
+    /***
+     *
+     */
+    sizeOf( ):number
+    /***
+     *
+     */
+    endian( ):primitiveNumber
+    /***
+     *
+     */
+    random( min:primitiveNumber, max:primitiveNumber):primitiveNumber
+    /***
+     *
+     */
+    overflowThrow( message:string ):void
+    /***
+     *
+     */
     getType():string
-    endian(  ):number
+    /***
+     *
+     */
+    orThrow( message:string  ):primitiveNumber
+    /***
+     *
+     */
+    newer(value:Number ):primitiveNumber
+    /***
+     *
+     */
+    valueOf():number
+    /***
+     *
+     */
+    toHex():string
+    /***
+     *
+     */
+    toBin():string
+    /***
+     *
+     */
+    toOctal():number
+    /***
+     *
+     */
+    int2Str():string
+    /***
+     *
+     */
+    toUnsigned():primitiveNumber
+    /***
+     *
+     */
+    hasFloat():boolean
+}
+/****
+ * @BYTE interface
+ */
+export interface BYTE extends primitiveNumber{
+    /***
+     */
+    toInt8():int8
+    /***
+     */
+    operators( ):Operator<BYTE>
+    /***
+     */
+    endian():BYTE
+}
+/****
+ * @uint8 interface
+ */
+export interface uint8 extends BYTE{}
+/****
+ * @int8 interface
+ */
+export interface int8 extends primitiveNumber{
+    /***
+     *
+     */
+    toUint8():Byte
+
+}
+/****
+ * @int8 interface
+ */
+export interface WORD extends primitiveNumber{
+    /***
+     *
+     */
+    toInt16():int16
+    operators( ):Operator<WORD>
+    endian():WORD
+}
+/****
+ * @int16 interface
+ */
+export interface int16 extends primitiveNumber{
+    /***
+     *
+     */
+    toUint16():WORD
+    operators( ):Operator<int16>
+    endian():int16
+}
+/****
+ * @DWORD interface
+ */
+export interface DWORD extends primitiveNumber{
+    /***
+     *
+     */
+    toInt32():int32
+    operators( ):Operator<DWORD>
+    toFloat():float
+}
+export interface uint32 extends DWORD{}
+/****
+ * @int32 interface
+ */
+export interface int32 extends primitiveNumber{
+    /***
+     *
+     */
+    toUint32():DWORD
+    operators( ):Operator<int32>
+}
+
+/**
+ * @float
+ */
+export interface float extends primitiveNumber{
+    /***
+     *
+     */
+    toUint32():DWORD
+    operators( ):Operator<float>
+}
+/***
+ * @QWORD
+ */
+export interface QWORD extends primitiveNumber{
+    /***
+     *
+     */
+    toInt64():int64
+    operators( ):Operator<QWORD>
+}
+/***
+ * @int64
+ */
+export interface int64 extends primitiveNumber{
+    /***
+     *
+     */
+    toUint64():QWORD
+    operators( ):Operator<int64>
+}
+/***
+ * @double
+ */
+export interface double extends primitiveNumber{
+    /***
+     *
+     */
+    toQword():QWORD
+    operators( ):Operator<double>
+    toQword( ):QWORD
+}
+
+/***
+ * @operators<T extends Number,U>
+ */
+export interface operators<T extends Number,U> {
+    /***
+     *
+     */
+    add( a:T, b:T ):U
+    /***
+     *
+     */
+    mul( a:T, b:T ):U
+    /***
+     *
+     */
+    div( a:T, b:T ):U
+    /***
+     *
+     */
+    sous( a:T, b:T ):U
+    /***
+     *
+     */
+    inc( a:T ):U
+    /***
+     *
+     */
+    dec( a:T ):U
+    /***
+     *
+     */
+    and( a:T, b:T ):U
+    /***
+     *
+     */
+    or( a:T, b:T ):U
+    /***
+     *
+     */
+    xor( a:T, b:T ):U
 }
 
 export interface bitString extends String{
@@ -94,12 +369,12 @@ declare global {
 /****
  * Types
  */
-export type BitsType = (Byte|int8|uint8|WORD|int16|uint16|u_short|DWORD|int32|uint32|QWORD|int64|u_long|Float|Double) & AbstractBitNumber
+export type BitsType    = (BYTE|int8|uint8|WORD|int16|DWORD|int32|uint32|QWORD|int64|float|double) & primitiveNumber
 export type BitsTypeStr = (Char|Pointer<BitsType|BitsTypeStr>|CString ) & AbstractBiString
-export type BitsTypeArr = (ByteArray|int8Array|WordArray|int16Array|DwordArray|int32Array|QwordArray|int64Array|FloatArray|DoubleArray) & ArrayL<BitsType>
+export type BitsTypeArr = (ByteArray|int8Array|WordArray|int16Array|DwordArray|int32Array|/*QwordArray|int64Array|*/FloatArray/*|DoubleArray*/) & ArrayL<BitsType>
 
-export type s_bits = { [ index:string]:number }
-export type pvoidStruct = { [ index: string]:BitsType|BitsTypeStr|s_bits|BitsTypeArr|Function };
+export type s_bits      = { [ index:string]:number }
+export type pvoidStruct = { [ index: string]:primitiveNumber|BitsType|BitsTypeStr|s_bits|BitsTypeArr|Function };
 
 export type LITTLE_ENDIAN   = 0x00;
 export type BIG_ENDIAN      = 0x01;
