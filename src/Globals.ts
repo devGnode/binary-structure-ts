@@ -8,11 +8,11 @@ import {
     int16Array,
     DwordArray,
     int32Array,
-    //QwordArray,
-    //int64Array,
     FloatArray,
-    //DoubleArray,
-    ArrayL
+    ArrayL,
+    QwordArray,
+    int64Array,
+    DoubleArray
 } from "./ArrayL";
 import {IConsumer} from "lib-utils-ts/src/Interface";
 import {Operator} from "./Operator";
@@ -395,7 +395,7 @@ declare global {
  */
 export type BitsType    = (BYTE|int8|uint8|WORD|int16|DWORD|int32|uint32|QWORD|int64|float|double) & primitiveNumber
 export type BitsTypeStr = (char|pointer<BitsType|BitsTypeStr>|cString) & primitiveString
-export type BitsTypeArr = (ByteArray|int8Array|WordArray|int16Array|DwordArray|int32Array|/*QwordArray|int64Array|*/FloatArray/*|DoubleArray*/) & ArrayL<BitsType>
+export type BitsTypeArr = (ByteArray|int8Array|WordArray|int16Array|DwordArray|int32Array|QwordArray|int64Array|FloatArray|DoubleArray) & ArrayL<BitsType>
 
 export type s_bits      = { [ index:string]:number }
 export type pvoidStruct = { [ index: string]:primitiveNumber|BitsType|BitsTypeStr|s_bits|BitsTypeArr|Function };
