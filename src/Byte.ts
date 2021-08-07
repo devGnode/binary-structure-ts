@@ -3,6 +3,8 @@ import { PrimitiveNumber} from "./PrimitiveNumber";
 import {int8,BYTE} from "./Globals";
 /****
 * @Byte
+ * @IOException
+ * @NumericOverflow
 */
 export class Byte extends PrimitiveNumber.Unsigned8 implements BYTE{
 

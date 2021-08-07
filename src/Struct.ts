@@ -1,4 +1,3 @@
-import {AbstractBitNumber} from "./AbstractBitNumber";
 import {
     BitsType,
     BitsTypeStr,
@@ -185,8 +184,8 @@ export class Struct{
     public static bit2chr( pSubStruct: s_bits, pVoiSubStruct: s_bits  ):string{
         let key:string, len:number, tLen:number = 0, n:number = 0, out:string = "";
 
-        Object.requireNotNull(pSubStruct,"bit2chr missing pSubStruct args");
-        Object.requireNotNull(pVoiSubStruct, "bit2chr missing pVoidSubStruct args");
+        Object.requireNotNull(pSubStruct,"missing pSubStruct args");
+        Object.requireNotNull(pVoiSubStruct, "missing pVoidSubStruct args");
         for( key in pVoiSubStruct ){
 
             Object.requireNotNull(pSubStruct[key], `Structure element not found : ${key}`);
@@ -196,15 +195,15 @@ export class Struct{
                 // overflow int 32 bit QWORD not supported
                 // by slice of 32bits
                 if( Math.pow( 2, ( tLen += len ) ) > Math.pow( 2, SZB.DW ) ){
-                    out += AbstractBitNumber.int2chr(n, Types.DWORD );
+                    out += Convert.To.int2Str(n);
                     tLen = n = 0;
                 }
                 n = ( n > 0 ) ? (( n << len ) | pSubStruct[key] ) : pSubStruct[key];
             }else{
-                throw new RuntimeException(`Bits structure overflow : ${key} use ${len} bit(s)`);
+                throw new RuntimeException(`Bits Structure Overflow : ${key} use ${len} bit(s)`);
             }
         }
-        return out + AbstractBitNumber.int2chr(n);
+        return out + Convert.To.int2Str(n);
     }
     /***
      * @stringBuffer:
@@ -346,7 +345,6 @@ export class Struct{
 
         for( key in pStruct ){
 
-            // Number
             pType = pStruct[key];
             if( pType instanceof PrimitiveNumber.PrimitiveNumberBuilder ) bufferA += (<primitiveNumber>pType).toString();
             else if( pType instanceof PrimitiveString.PrimitiveStrBuilder ){
@@ -361,7 +359,7 @@ export class Struct{
                 }
                 bufferA += pType.valueOf() + end;
             }
-            else if(pType instanceof ArrayL){ console.log("Array"); pType.map(value=>bufferA+= value.toString()); }
+            else if(pType instanceof ArrayL){ pType.map(value=>bufferA+= value.toString()); }
             // Sub bits structure
             else if(typeof pType ==="object"&&!(pType instanceof Function)) bufferA += Struct.bit2chr(<s_bits>pType,<s_bits>pVoidStruct[key]);
         }

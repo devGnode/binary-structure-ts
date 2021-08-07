@@ -6,7 +6,8 @@ import {Word} from "./Word";
 import {Convert} from "./Convert";
 /***
  * @Dword
- *
+ * @IOException
+ * @NumericOverflow
  */
 export class Dword extends PrimitiveNumber.Unsigned32 implements DWORD{
 

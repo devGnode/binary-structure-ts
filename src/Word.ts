@@ -3,6 +3,8 @@ import {Operator} from "./Operator";
 import {PrimitiveNumber} from "./PrimitiveNumber";
 /****
  * @Word
+ * @IOException
+ * @NumericOverflow
  */
 export class Word extends PrimitiveNumber.Unsigned16 implements WORD{
     /****
