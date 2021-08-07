@@ -6,12 +6,11 @@ import {
     pvoidStruct,
     s_bits,
     SZB,
-    Types,
     primitiveString
 } from "./Globals";
 import {Byte} from "./Byte";
 import {Float} from "./Float";
-import { RuntimeException,IndexOfBoundException } from "lib-utils-ts/src/Exception";
+import {RuntimeException, IndexOfBoundException} from "lib-utils-ts/src/Exception";
 import {Class} from "lib-utils-ts/src/Class";
 import {Define} from "lib-utils-ts/src/Define";
 import {ArrayL} from "./ArrayL";
@@ -269,7 +268,7 @@ export class Struct{
 
         // fill struct
         for (key in pVoidStruct) {
-            pType = pVoidStruct[key];
+            pType = Object.requireNotNull(pVoidStruct[key]);
 
             /****
              * Primitive number

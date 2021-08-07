@@ -1,5 +1,5 @@
 import {Operators} from "./Operators";
-import {RuntimeException} from "lib-utils-ts/src/Exception";
+import {IllegalArgumentException} from "lib-utils-ts/src/Exception";
 import {primitiveNumber} from "./Globals";
 import {PrimitiveNumber} from "./PrimitiveNumber";
 /***
@@ -20,7 +20,7 @@ export class Operator<T extends primitiveNumber>{
      */
     private cast( a: T|number ):T{
         if( !(a instanceof PrimitiveNumber.PrimitiveNumberBuilder ) ) return <T>this.value.getClass().newInstance(Number(a));
-        if(!(<T>a).signed().equals(this.value.signed())) throw new RuntimeException(`Bad Cast Operator : cannot cast ${(<T>a).signed()?"signed":"unsigned"} number to ${this.value.signed()?"signed":"unsigned"} number`)
+        if(!(<T>a).signed().equals(this.value.signed())) throw new IllegalArgumentException(`Bad Cast Operator : cannot cast ${(<T>a).signed()?"signed":"unsigned"} number to ${this.value.signed()?"signed":"unsigned"} number`)
         return <T>a;
     }
     /***

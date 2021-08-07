@@ -7,7 +7,7 @@ import {Convert} from "./Convert";
 /***
  * @Dword
  * @IOException
- * @NumericOverflow
+ * @NumericOverflowException
  */
 export class Dword extends PrimitiveNumber.Unsigned32 implements DWORD{
 
@@ -41,7 +41,8 @@ export class Dword extends PrimitiveNumber.Unsigned32 implements DWORD{
 }
 /***
  * @Uint32
- *
+ * @IOException
+ * @NumericOverflowException
  */
 export class Uint32 extends PrimitiveNumber.Unsigned32 implements DWORD{
 
@@ -66,7 +67,8 @@ export class Uint32 extends PrimitiveNumber.Unsigned32 implements DWORD{
 }
 /***
  * @Int32
- *
+ * @IOException
+ * @NumericOverflowException
  */
 export class Int32 extends PrimitiveNumber.Signed32 implements int32{
 

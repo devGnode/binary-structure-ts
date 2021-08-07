@@ -1,5 +1,5 @@
 import {LIMIT, primitiveNumber, Types} from "./Globals";
-import {NumericOverflow} from "./NumericOverflow";
+import {NumericOverflowException} from "./NumericOverflowException";
 import {IOException, RuntimeException} from "lib-utils-ts/src/Exception";
 import {Define} from "lib-utils-ts/src/Define";
 import {Convert} from "./Convert";
@@ -16,6 +16,7 @@ export abstract class PrimitiveNumber{
     }
     /***
      * @slice32
+     * @value: unsigned number max 32bits
      */
     public static slice32(value:number):number[]{
         return [( value >> 24 )&0xff, ( value >> 16 )&0xff, ( value >> 8 )&0xff, value&0xff]
@@ -64,7 +65,7 @@ export abstract class PrimitiveNumber{
          */
         public orThrow(message: string = null): primitiveNumber {
             if(!this.signed()&&!this.isPositive()) throw new IOException(`${this.getClass().getName()} is not a ${!this.signed() ? "s" : "uns"}igned number : [ ${this.valueOf()} ]`);
-            if (this.isOverflow()) throw new NumericOverflow(message || `${this.signed() ? "S" : "Uns"}igned ${this.getClass().getName()} overflow  ${this.sizeOf()} byte(s) out of memory : [ ${this.valueOf()} ]`);
+            if (this.isOverflow()) throw new NumericOverflowException(message || `${this.signed() ? "S" : "Uns"}igned ${this.getClass().getName()} overflow  ${this.sizeOf()} byte(s) out of memory : [ ${this.valueOf()} ]`);
             if(!this.hasFloat()&&PrimitiveNumber.isFloat(this.valueOf())) throw new IOException(`${this.getClass().getName()} is not a float number !`);
             return this;
         }

@@ -2,9 +2,9 @@ import {Operator} from "./Operator";
 import { PrimitiveNumber} from "./PrimitiveNumber";
 import {int8,BYTE} from "./Globals";
 /****
-* @Byte
+ * @Byte : Unsigned number, limit 0 < x >= 255
  * @IOException
- * @NumericOverflow
+ * @NumericOverflowException
 */
 export class Byte extends PrimitiveNumber.Unsigned8 implements BYTE{
 
@@ -36,8 +36,9 @@ export class Byte extends PrimitiveNumber.Unsigned8 implements BYTE{
     }
 }
 /****
- * @Uint8
- *
+ * @Uint8 : Unsigned number, limit 0 < x >= 255
+ * @IOException
+ * @NumericOverflowException
  */
 export class Uint8 extends PrimitiveNumber.Unsigned8 implements BYTE{
 
@@ -69,8 +70,9 @@ export class Uint8 extends PrimitiveNumber.Unsigned8 implements BYTE{
     }
 }
 /****
- * @Int8
- *
+ * @Int8 Signed number, limit -128 < x >= 127
+ * @IOException
+ * @NumericOverflowException
  */
 export class Int8 extends PrimitiveNumber.Signed8 implements int8{
 

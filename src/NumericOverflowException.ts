@@ -1,12 +1,12 @@
 import {RuntimeException} from "lib-utils-ts/src/Exception";
 /****
- * @NumericOverflow
+ * @NumericOverflowException
  */
-export class NumericOverflow extends RuntimeException{
+export class NumericOverflowException extends RuntimeException{
     /****
      *
      */
-    name = NumericOverflow.class().getName();
+    name = NumericOverflowException.class().getName();
     /****
      *
      */
