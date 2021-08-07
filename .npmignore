@@ -1,0 +1,14 @@
+#
+.git/
+.idea/
+logs/
+tatget/
+
+# project
+src/
+Test/
+node_modules/
+
+# CI/CD
+Jenkinsfile
+*.yml

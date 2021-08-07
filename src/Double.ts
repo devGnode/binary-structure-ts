@@ -1,23 +1,25 @@
-import {Types} from "./Globals";
-import {AbstractBitNumber} from "./AbstractBitNumber";
-import {QWORD} from "./QWORD";
+import {PrimitiveNumber} from "./PrimitiveNumber";
+import {Operator} from "./Operator";
+import {double, QWORD} from "./Globals";
+import {Qword} from "./Qword";
 
+export class Double extends PrimitiveNumber.Unsigned64 implements double{
 
-export class Double  extends AbstractBitNumber{
+    constructor(value: Number = null) {
+        super(value);
+        this.orThrow();
+    }
 
-    protected sizeof: Types = Types.double&0xf;
-    protected type:string   = Double.class().getName();
+    public endian(): Double {return Double.mk(super.endian().valueOf())}
 
-    constructor(value:number=0.00) {super(value)}
-
-    public valueOf(): number {return super.valueOf() === 0 ? 0.00 : super.valueOf();}
+    public operators(): Operator<Double> {return new Operator<Double>(this);}
 
     public toQword( ):QWORD{
         let bit:number = (this.valueOf()<0?1:0)*Math.pow(2,63),
             exp:number,i:number = 0,j:number = 0, mantis:number,
             tmp:number = this.valueOf();
 
-        if(this.valueOf().equals(0))return QWORD.from(0);
+        if(this.valueOf().equals(0))return Qword.mk(0);
         tmp = Math.abs(tmp);
         while ( true ){
             j = tmp>=1?i:-i;
@@ -27,14 +29,12 @@ export class Double  extends AbstractBitNumber{
 
         mantis = Math.round( (exp - Math.floor(exp))* (Math.pow( 2, 51)) );
 
-        return QWORD.from(bit + ((1023+j)*Math.pow(2,52)) + mantis );
+        return Qword.mk(bit + ((1023+j)*Math.pow(2,52)) + mantis );
     }
 
-    public toString(radix?: number): string {
-        return radix && radix === 16 ? this.toQword().toHex() : this.int2chr(this.toQword().valueOf(),this.sizeof);
+    public static mk(value: number = null): Double {return new Double(value);}
+
+    public static random(min: Double = null, max: Double = null): Double {
+        return Double.mk(Double.mk(0).random(min, max).valueOf());
     }
-
-    public static instanceOf(o: Object):boolean{ return o instanceof Double; }
-
-    public static from( value:number = 0.00 ):Double{return new Double(value);}
 }

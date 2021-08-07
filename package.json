@@ -1,6 +1,6 @@
 {
-  "name": "struct",
-  "version": "1.0.0",
+  "name": "binary-struct-ts",
+  "version": "1.0.4",
   "description": "",
   "author": "Maroder - <devgnode@gmail.com>",
   "license": "Apache-2.0",
@@ -23,6 +23,6 @@
     "ts-node": "^9.1.1"
   },
   "dependencies": {
-    "lib-utils-ts": "^2.0.0-stable"
+    "lib-utils-ts": "../../lib-utils-ts"
   }
 }

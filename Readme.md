@@ -4,33 +4,38 @@
 
 ## Dependencies
 
-- lib-utils-ts `>= 2.0.0-stable`
+- lib-utils-ts `>= 3.0.0-stable`
 
 ## Types
 
 * Byte
-    * Bytes
-    * int8
-    * uint8
+    * Byte
+    * Int8
+    * Uint8
+    
 * Word
-    * WORD
-    * int16
-    * u_short
+    * Word
+    * Int16
+    * Uint16
+    
 * Dword
-    * DWORD
-    * int32
-    * uint32
+    * Dword
+    * Int32
+    * Uint32
     * Float
-* Qword
-    * QWORD
-    * int64
-    * u_long
+ 
+* Qword - not really implemented
+
+    * Qword
+    * Int64
     * Double
+
+* Character
+    * Char
+    * CString
     
 * Pointer
-    * Pointer
-    * CString
-    * Char
+    
 * ArrayL
     * ByteArray
     * int8Array
@@ -43,26 +48,38 @@
     * FloatArray
     * DoubleArray
        
-## Number
+## PrimitiveNumber
 
-Each extended type extends of native javascript `Number` class.
+`public class PrimitiveNumber.PrimitiveBuilder extends Number implements primitiveNumber`
+    
+Public readonly properties :
 
-Private properties :
-
-- sizeof : siz of type in memory
-- type   : type name
-
+- MIN : min natural number
+- MAX : max natural number
 
 Override & extends :
 
-- `toHex():string` : return string value
-- `signed():boolean` : is a signed number
-- `endian():number` : is a signed number
-- `sizeof():number` : is a signed number
-- `getType():string` : is a type name ( DWORD, WORD )
-- `toString( radix?:number ):string` : if radix is equal to 16, it will be returned a hex value, otherwise will be return type in string value ( binary )
+- `isOverflow( ):boolean` : Check if number is overflow
+- `signed():boolean` : return signed number flag
+- `isPositive( ):boolean` : is positive number
+- `sizeof():number`  : memory sizeof
+- `endian( ):primitiveNumber` : reverse order of bits
+- `overflowThrow( message:string ):void` : 
+- `orThrow( message:string  ):primitiveNumber`
+- `random( min:primitiveNumber, max:primitiveNumber):primitiveNumber` 
+- `valueOf():number`
+- `getType():string`
+- `toHex():string`
+- `toBin():string`
+- `toOctal():number`
+- `int2Str():string`
+- `toUnsigned():primitiveNumber`
+- `hasFloat():boolean`
+- `newer(value:Number ):primitiveNumber`
 
-get value of type :
+: if radix is equal to 16, it will be returned a hex value, otherwise will be return type in string value ( binary )
+
+Get value of a primitive type :
 
 - `valueOf():number`
 
@@ -70,25 +87,31 @@ get value of type :
 
 Some example basic method
 
-##### Word
+##### Byte
 
 ````typescript
 
-let byte :Byte = Byte.from(255);
-// let byte :Byte = Byte.from(400);  throw exception overflow
+let byte :Byte = Byte.mk(255);
+// let byte :Byte = Byte.mk(400);  throw exception overflow
 
 console.log("out ", byte.toString() ); // ÿ
 console.log("out ", byte.toInt8().valueOf() ); // -1
 
 console.log("out ", byte.endian().valueOf() ); // 255
 
+console.log( Byte.mk(255).toHex() ) // ff
+console.log( Byte.mk(255).toBin() ) // 11111111
+console.log( Byte.mk(255).toOCtal() ) // 377
+
+console.log( Byte.mk(15).toHex(Convert.NO) ) // f
+console.log( Byte.mk(255).toHex(Convert.X2) ) // f 
 ````
 ##### int8
 
 ````typescript
 
 let byte :int8 = int8.from(-1);
-// let byte :int8 = int8.from(400);  throw exception overflow
+// let byte :int8 = int8.mk(400);  throw exception NumericOverflow
 
 console.log("out ", byte.toString() ); // ÿ
 console.log("out ", byte.toUint8().valueOf() ); // 255
@@ -97,15 +120,15 @@ console.log("out ", byte.endian().valueOf() ); // -1
 
 ````
 
-##### WORD
+##### Word
 
 ````typescript
 
-let word :WORD = WORD.from( 0x1f2f );
-// let word :WORD = Byte.from(65538);  throw exception overflow
+let word :Word = Word.mk( 0x1f2f );
+// let word :WORD = Byte.from(65538);  throw exception NumericOverflow
 
-console.log(word.Endian().toString(16)); // 2f1f
-console.log(word.Endian().getType()); // WORD
+console.log(word.endian().toString(16)); // 2f1f
+console.log(word.endian().getType()); // Word
 
 console.log(word.sizeOf()); // 2
 console.log(word.signed()); // false
@@ -114,31 +137,29 @@ console.log("out ", word.toInt16().valueOf() ); // 7983
 
 ````
 
-##### int16
+##### Int16
 
 ````typescript
 
-let i16 :int16 = int16.from( 0x1f2f );
-// let word :WORD = Byte.from(65538);  throw exception overflow
+let i16 :Int16 = Int16.mk( 0x1f2f );
+// let word :Word = Byte.mk(65538);  throw exception NumericOverflow
 
-console.log(i16.instanceof(i16)); // true
-console.log(i16.Endian().getType()); // int16
+console.log(i16.endian().getType()); // Int16
 
 console.log(i16.sizeOf()); // 2
 console.log(i16.signed()); // true
 
 ````
 
-### DWORD & QWORD type
+### Dword & Qword type
 
-Only these both class are a method different to other else.
 
 ````typescript
 
 let f :Float = Float.from( 0.200 );
 let d :int32 = int32.from( -1102263091 );
 
-console.log(f.toDword()); // 0xBE4CCCCD
+console.log(f.toUint32()); // 0xBE4CCCCD
 console.log(d.toFloat()); // 0.20000.....
 
 console.log(f.sizeOf()); // 4
@@ -160,18 +181,18 @@ type IStruct_0 = {
     b0: Byte,
     b1: int8,
     w0: WORD,
-    w1: u_short,
+    w1: uint16,
     dw: int32
 } & pvoidStruct
 
 // Mount ObjectStruct
 let MyStruct:Function= ():IStruct_0=>{
     return {
-        b0: Byte.from(),
-        b1: int8.from(),
-        w0: WORD.from(),
-        w1: u_short.from(),
-        dw: int32.from()
+        b0: Byte.mk(),
+        b1: Int8.mk(),
+        w0: Word.mk(),
+        w1: Uint16.mk(),
+        dw: Int32.mk()
     };
 };
 
@@ -188,11 +209,11 @@ console.log(struct);
 
 ````text
 {
-  b0: [Number (Byte): 1] { sizeof: 1, type: 'Byte' },
-  b1: [Number (int8): -1] { sizeof: 1, type: 'int8' },
-  w0: [Number (WORD): 7983] { sizeof: 2, type: 'WORD' },
-  w1: [Number (u_short): 32896] { sizeof: 2, type: 'u_short' },
-  dw: [Number (int32): 16909060] { sizeof: 4, type: 'int32' }
+  b0: [Number (Byte): 1] ,
+  b1: [Number (int8): -1],
+  w0: [Number (WORD): 7983],
+  w1: [Number (u_short): 32896],
+  dw: [Number (int32): 16909060] 
 }
 ````
 
@@ -223,7 +244,7 @@ Prototype of buffer2Struct
 - `memSet( pVoidStruct: pvoidStruct, value:Byte = Byte.from(0x00) ):pvoidStruct`
 
 ````typescript
-Struct.memSet(MyStruct(),Byte.from(0))
+Struct.memSet(MyStruct(),Byte.mk(0))
 ````
 
 ````text
@@ -261,15 +282,15 @@ export type DNS_NAME = {
 
 export let FS_DNS_H:Function =():DNS_HEADER=>{
     return {
-        id      :   WORD.from(),
+        id      :   Word.mk(),
         flags   :   { a:1, fc:4, dc:1, ed:1, e:1, y:1, aa:1, ag:1, nb:1, jk:4 }, // wireshark 
-        Qdcount :   WORD.from(),
-        Ancount :   WORD.from(),
-        Nscount :   WORD.from(),
-        Arcount :   WORD.from(),
-        query   :   CString.from(),
-        type    :   WORD.from(),
-        class   :   WORD.from()
+        Qdcount :   Word.mk(),
+        Ancount :   Word.mk(),
+        Nscount :   Word.mk(),
+        Arcount :   Word.mk(),
+        query   :   CString.of(),
+        type    :   Word.mk(),
+        class   :   Word.mk()
     };
 };
 

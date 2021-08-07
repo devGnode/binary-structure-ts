@@ -1,25 +1,28 @@
-import {AbstractBitNumber} from "./AbstractBitNumber";
-import {Types} from "./Globals";
+import {Operator} from "./Operator";
+import {PrimitiveNumber} from "./PrimitiveNumber";
+import {DWORD, int32} from "./Globals";
 import {Float} from "./Float";
-import { RuntimeException } from "lib-utils-ts/src/Exception";
-/****
- * DWORD
+import {Word} from "./Word";
+import {Convert} from "./Convert";
+/***
+ * @Dword
+ * @IOException
+ * @NumericOverflowException
  */
-export class DWORD extends AbstractBitNumber{
+export class Dword extends PrimitiveNumber.Unsigned32 implements DWORD{
 
-    protected sizeof: Types = Types.DWORD;
-    protected type:string   = DWORD.class().getName();
-
-    constructor(value:number= 4294967295 ) {super(DWORD.$__ctrlOvflw(value));}
-
-    private static $__ctrlOvflw(value:number):number{
-        if( value < 0 || value > 0xffffffff ) throw new RuntimeException(`Unsigned number 32 bits overflow : [ ${value} ]`);
-        return value;
+    constructor(value:Number=null) {
+        super(value);
+        this.orThrow();
     }
 
-    public toInt32():int32{ return int32.from(this.valueOf()&0xffffffff); }
+    public endian():Dword{return new Dword(super.endian().valueOf())}
 
-    public toFloat( ):Float{
+    public operators( ):Operator<Dword>{return new Operator<Dword>(this);}
+
+    public toInt32():Int32 {return Int32.mk(this.valueOf()&0xFFFFFFFF ); }
+
+    public toFloat(): Float {
         let valueOf:number = this.valueOf(),
             signed:number  = ( valueOf >> 31 )&0x01,
             exp:number     = ( valueOf&0x7f800000 ) >> 23,
@@ -27,55 +30,64 @@ export class DWORD extends AbstractBitNumber{
 
         mantis = ( mantis / Math.pow( 2, 23 )) + 1;
 
-        return Float.from( (signed === 1 ? -signed : 1 ) * mantis *  Math.pow(2, exp-127 ) );
+        return Float.mk( (signed === 1 ? -signed : 1 ) * mantis *  Math.pow(2, exp-127 ) );
     }
 
-    public Endian():DWORD{return DWORD.from(super.endian());}
+    public static mk(value:number=null):Dword{return new Dword(value);}
 
-    public static instanceOf(o: Object):boolean{ return o instanceof DWORD; }
-
-    public static from( value:number = 4294967295 ):DWORD{return new DWORD(value);}
+    public static random(min: Dword = null, max: Dword = null): Dword {
+        return Dword.mk(Word.mk(0).random(min, max).valueOf());
+    }
 }
-/****
- * int32
+/***
+ * @Uint32
+ * @IOException
+ * @NumericOverflowException
  */
-export class int32 extends AbstractBitNumber{
+export class Uint32 extends PrimitiveNumber.Unsigned32 implements DWORD{
 
-    protected sizeof: Types = Types.DWORD;
-    protected type:string = int32.class().getName();
-
-    constructor(value:number=-1) {super(int32.$__ctrlOvflw(value));}
-
-    private static $__ctrlOvflw(value:number):number{
-        let limit:number = Math.floor(0xffffffff/2 );
-        if( (value < -limit) || (value > limit) ) throw new Error(`Signed number 32 bits overflow : [ ${value} ]`);
-        return value;
+    constructor(value:Number=null) {
+        super(value);
+        this.orThrow();
     }
 
-    public toUint32():uint32{return uint32.from(parseInt(this.toHex(),16));}
+    public endian():Uint32{return new Uint32(super.endian().valueOf())}
 
-    public toString(radix?: number): string {
-        return radix && radix === 16 ? super.toString(radix) : this.int2chr(this.toUint32().valueOf(),this.sizeof);
+    public operators( ):Operator<Uint32>{return new Operator<Uint32>(this);}
+
+    public toInt32():Int32 {return Int32.mk(this.valueOf()&0xFFFFFFFF ); }
+
+    public toFloat(): Float { return Dword.mk(this.valueOf()).toFloat(); }
+
+    public static mk(value:number=null):Uint32 {return new Uint32(value);}
+
+    public static random(min: Uint32 = null, max: Uint32 = null): Uint32 {
+        return Uint32.mk(Dword.mk(0).random(min, max).valueOf());
     }
-
-    public Endian():int32{return int32.from(super.endian());}
-
-    public static instanceOf(o: Object):boolean{ return o instanceof int32; }
-
-    public static from( value:number = -1 ):int32{return new int32(value);}
 }
-/****
- * uint32
+/***
+ * @Int32
+ * @IOException
+ * @NumericOverflowException
  */
-export class uint32 extends DWORD{
+export class Int32 extends PrimitiveNumber.Signed32 implements int32{
 
-    protected type:string = uint32.class().getName();
+    constructor(value:Number=null) {
+        super(value);
+        this.orThrow();
+    }
 
-    constructor(value:number=0x00) {super(value);}
+    public endian():Int32{return new Int32(super.endian().valueOf())}
 
-    public Endian():uint32{return uint32.from(super.endian());}
+    public operators( ):Operator<Int32>{return new Operator<Int32>(this);}
 
-    public static instanceOf(o: Object):boolean{ return o instanceof uint32; }
+    public toUint32():Uint32 {
+        return Uint32.mk(Convert.arrayToNumber( PrimitiveNumber.slice32(this.valueOf()) ));
+    }
 
-    public static from( value:number = 0x00 ):uint32{return new uint32(value);}
+    public static mk(value:number=null):Int32{return new Int32(value);}
+
+    public static random(min: Int32 = null, max: Int32 = null): Int32 {
+        return Int32.mk(Int32.mk(0).random(min, max).valueOf());
+    }
 }

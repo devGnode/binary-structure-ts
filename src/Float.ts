@@ -1,22 +1,28 @@
-import {AbstractBitNumber} from "./AbstractBitNumber";
-import {Types} from "./Globals";
-import {DWORD} from "./Dword";
+import {Operator} from "./Operator";
+import {PrimitiveNumber} from "./PrimitiveNumber";
+import {Int32, Uint32} from "./Dword";
+import {float} from "./Globals";
+/***
+ * @Float
+ */
+export class Float extends PrimitiveNumber.Float32 implements float{
 
-export class Float extends AbstractBitNumber{
+    constructor(value:Number=null) {
+        super(value);
+        this.orThrow();
+    }
 
-    protected sizeof: Types = Types.float&0xf;
-    protected type:string   = Float.class().getName();
+    public endian():Float {return this.toUint32().endian().toFloat();}
 
-    constructor(value:number=0.00) {super(value);}
+    public operators( ):Operator<Float>{return new Operator<Float>(this);}
 
-    public valueOf(): number {return super.valueOf() === 0 ? 0.00 : super.valueOf();}
-
-    public toDword( ):DWORD{
+    public toUint32():Uint32 {
         let valueOf:number = this.valueOf(),
             signed:number = Math.abs( (valueOf<0?1:0) << 31 ),
             i:number = 0, j:number = 0,
             exp:number, mantis:number;
 
+        if(this.valueOf().equals(0))return Uint32.mk(0);
         valueOf = Math.abs(valueOf);
         while(true){
             j = valueOf>=1?i:-i;
@@ -25,14 +31,14 @@ export class Float extends AbstractBitNumber{
         }
         mantis = (exp-Math.floor(exp)) * Math.pow(2,23);
 
-        return DWORD.from( signed + ( ( 127 + j ) << 23 ) + Math.floor(mantis) );
+        return Uint32.mk( signed + ( ( 127 + j ) << 23 ) + Math.floor(mantis) );
     }
 
-    public toString(radix?: number): string {
-        return radix && radix === 16 ? this.toDword().toHex() : this.int2chr(this.toDword().valueOf(),this.sizeof);
+    public toString(radix?: number): string {return this.toUint32().toString(radix);}
+
+    public static mk(value:number=null):Float{return new Float(value);}
+
+    public static random(min: Float = null, max: Float = null): Float {
+        return Float.mk(Int32.mk(0).random(min, max).valueOf());
     }
-
-    public static instanceOf(o: Object):boolean{ return o instanceof Float; }
-
-    public static from( value:number = 0.00 ):Float{return new Float(value);}
 }
