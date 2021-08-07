@@ -1,7 +1,6 @@
 import "lib-utils-ts/src/globalUtils"
 import {Byte} from "./Byte";
-import {Char, CString, Pointer} from "./Pointer";
-import {AbstractBiString} from "./AbstractBiString";
+import {Pointer} from "./Pointer";
 import {
     ByteArray,
     int8Array,
@@ -351,10 +350,35 @@ export interface operators<T extends Number,U> {
      */
     xor( a:T, b:T ):U
 }
-
-export interface bitString extends String{
+/***
+ *
+ */
+export interface primitiveString {
     sizeOf():number
     getType():string
+}
+/***
+ *
+ */
+export interface char extends primitiveString{
+    toUint8( ):uint8
+    valueOf(): string
+}
+/***
+ *
+ */
+export interface cString extends primitiveString{
+    hasPointer( ):boolean
+    getPointer():Pointer<BitsType>
+    valueOf():string
+}
+/***
+ *
+ */
+export interface pointer<T> extends primitiveString{
+    pointerName():string
+    getRange( ):number
+    getValue( ):T
 }
 /****
  *
@@ -370,7 +394,7 @@ declare global {
  * Types
  */
 export type BitsType    = (BYTE|int8|uint8|WORD|int16|DWORD|int32|uint32|QWORD|int64|float|double) & primitiveNumber
-export type BitsTypeStr = (Char|Pointer<BitsType|BitsTypeStr>|CString ) & AbstractBiString
+export type BitsTypeStr = (char|pointer<BitsType|BitsTypeStr>|cString) & primitiveString
 export type BitsTypeArr = (ByteArray|int8Array|WordArray|int16Array|DwordArray|int32Array|/*QwordArray|int64Array|*/FloatArray/*|DoubleArray*/) & ArrayL<BitsType>
 
 export type s_bits      = { [ index:string]:number }
