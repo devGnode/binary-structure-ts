@@ -119,7 +119,7 @@ export abstract class PrimitiveNumber{
                 switch (this.sizeOf()) {
                     case Types.BYTE: return new PrimitiveNumber.Unsigned8(this.valueOf()&0xFF);
                     case Types.WORD: return new PrimitiveNumber.Unsigned16(this.valueOf()&0xFFFF);
-                    case Types.DWORD:return new PrimitiveNumber.Unsigned32(this.valueOf()&0xFFFFFFFF);
+                    case Types.DWORD:return new PrimitiveNumber.Unsigned32(Convert.arrayToNumber(PrimitiveNumber.slice32(this.valueOf())));
                     case Types.QWORD:
                     default:
                         throw new RuntimeException("unsupported !")
